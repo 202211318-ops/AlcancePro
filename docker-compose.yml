@@ -1,0 +1,31 @@
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: alcancepro-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: alcance
+      MONGO_INITDB_ROOT_PASSWORD: alcance123
+      MONGO_INITDB_DATABASE: alcancepro
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo-init:/docker-entrypoint-initdb.d:ro
+
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: alcancepro-mongo-express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: alcance
+      ME_CONFIG_MONGODB_ADMINPASSWORD: alcance123
+      ME_CONFIG_MONGODB_URL: mongodb://alcance:alcance123@mongo:27017/?authSource=admin
+      ME_CONFIG_BASICAUTH: "false"
+    depends_on:
+      - mongo
+
+volumes:
+  mongo_data:
