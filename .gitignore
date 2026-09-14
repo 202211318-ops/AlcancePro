@@ -11,8 +11,6 @@ node_modules/
 dist/
 .DS_Store
 Thumbs.db
-backend/.env
-frontend/.env
 mongo/data/
 mongo/log/
 tools/mongodb*
