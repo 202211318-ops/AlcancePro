@@ -18,7 +18,7 @@ GEMINI_MODELS = [
 ]
 
 INLINE_PDF_MAX = 4 * 1024 * 1024
-TEXT_CHARS = 28000
+TEXT_CHARS = 90000
 FILES_API = "https://generativelanguage.googleapis.com/upload/v1beta/files"
 GENERATE_API = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 
@@ -134,7 +134,10 @@ async def _build_parts(documents: list, api_key: str) -> tuple[list[dict], bool]
     parts: list[dict] = [
         {
             "text": SYSTEM_PROMPT
-            + "\n\nAnaliza los documentos. Usa la clasificación de cada archivo. Responde solo JSON."
+            + "\n\nAnaliza TODOS los documentos completos. Extrae el 100% de requisitos, plazos y entregables. "
+            "Usa la clasificación de cada archivo. No detengas el análisis en una muestra. "
+            "Seguimiento operativo: PENDIENTE por defecto; CUMPLIDO solo con evidencia de ejecución; "
+            "INCUMPLIDO solo con evidencia de retraso o rechazo. Responde solo JSON."
         }
     ]
     attached = 0
@@ -179,7 +182,7 @@ async def _generate(api_key: str, model: str, parts: list[dict], timeout: float)
         "generationConfig": {
             "temperature": 0.1,
             "responseMimeType": "application/json",
-            "maxOutputTokens": 8192,
+            "maxOutputTokens": 32768,
             "thinkingConfig": {"thinkingBudget": 0},
         },
     }

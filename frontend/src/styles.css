@@ -184,6 +184,10 @@ th {
 .row-actions { display: flex; gap: 12px; align-items: center; }
 td small { display: block; color: var(--muted); margin-top: 4px; }
 tr.flag td { background: #f7e4c8; }
+.status-select { font-weight: 700; }
+.status-select.status-PENDIENTE { background: #fff3cd; color: #856404; }
+.status-select.status-CUMPLIDO { background: #d4edda; color: #155724; }
+.status-select.status-INCUMPLIDO { background: #f8d7da; color: #721c24; }
 .toolbar, .upload-row {
   display: flex;
   gap: 12px;

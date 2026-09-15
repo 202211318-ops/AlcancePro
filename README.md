@@ -8,9 +8,9 @@ Sistema web para auditar el **alcance contractual** de expedientes públicos y p
 - Expedientes persistidos en **MongoDB** (`alcancepro`).
 - Carga de Bases/TDR, consultas, propuesta, contrato, adendas y anexos (PDF, DOCX, XLSX, TXT).
 - Análisis con IA usando granularidad microscópica y cruce documental TDR → consultas → propuesta → contrato.
-- Matriz de alcance del producto y del proyecto, con casilla de cumplimiento.
-- Entregables de gestión con plazo y referencia.
-- Exportación Excel (hojas `Checklist_Alcance` y `Entregables`, desplegable en columna F).
+- Matriz de alcance del producto y del proyecto, con seguimiento operativo (Pendiente / Cumplido / Incumplido).
+- Entregables de gestión con plazo, referencia y seguimiento operativo.
+- Exportación Excel (`Checklist_Alcance` y `Entregables`) con encabezados azul oscuro, filtros y formato condicional.
 
 ## Arquitectura
 
@@ -20,7 +20,7 @@ Sistema web para auditar el **alcance contractual** de expedientes públicos y p
 | Backend | Python FastAPI |
 | Base de datos | MongoDB 7 (`alcancepro`) |
 | Archivos | `backend/uploads` |
-| Excel | pandas + openpyxl |
+| Excel | openpyxl |
 | IA | Gemini (`LLM_API_KEY`) lee los PDF y extrae la matriz |
 
 ## 1. MongoDB

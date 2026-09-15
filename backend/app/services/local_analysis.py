@@ -111,6 +111,7 @@ def analyze_documents(documents: list) -> dict:
                     "consultas": "",
                     "propuesta": "",
                     "contrato": "",
+                    "seguimiento_operativo": "PENDIENTE",
                 },
             )
             previous = row[column]
@@ -130,6 +131,7 @@ def analyze_documents(documents: list) -> dict:
                         "entregable": item["texto"][:220],
                         "referencia_documental": f"{getattr(doc, 'doc_type', '')} / {filename}",
                         "plazo_entrega": plazo,
+                        "seguimiento_operativo": "PENDIENTE",
                     }
                 )
 

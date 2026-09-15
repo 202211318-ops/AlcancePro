@@ -114,7 +114,7 @@ export default function ExpedienteDetail() {
       const url = URL.createObjectURL(response.data);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `Checklist_Alcance_Proyecto_${expediente?.code || "export"}.xlsx`;
+      link.download = "Checklist_Alcance_Proyecto.xlsx";
       link.click();
       URL.revokeObjectURL(url);
     } catch (err) {
@@ -285,12 +285,12 @@ export default function ExpedienteDetail() {
             <table>
               <thead>
                 <tr>
-                  <th>A · Numeral</th>
-                  <th>B · Bases / TDR / ET</th>
+                  <th>A · Numeral del ítem</th>
+                  <th>B · Bases integradas / Documento base</th>
                   <th>C · Consultas</th>
                   <th>D · Propuesta</th>
                   <th>E · Contrato</th>
-                  <th>F · Cumplimiento</th>
+                  <th>F · Seguimiento Operativo</th>
                 </tr>
               </thead>
               <tbody>
@@ -313,10 +313,14 @@ export default function ExpedienteDetail() {
                     <td>{row.propuesta}</td>
                     <td>{row.contrato}</td>
                     <td>
-                      <select value={row.compliance} onChange={(e) => patchItem(row.id, { compliance: e.target.value })}>
+                      <select
+                        className={`status-select status-${row.compliance === "NO_CUMPLE" ? "INCUMPLIDO" : row.compliance}`}
+                        value={row.compliance === "NO_CUMPLE" ? "INCUMPLIDO" : row.compliance}
+                        onChange={(e) => patchItem(row.id, { compliance: e.target.value })}
+                      >
                         <option value="PENDIENTE">☐ Pendiente</option>
                         <option value="CUMPLIDO">☑ Cumplido</option>
-                        <option value="NO_CUMPLE">☒ No cumple</option>
+                        <option value="INCUMPLIDO">☒ Incumplido</option>
                       </select>
                     </td>
                   </tr>
@@ -332,16 +336,17 @@ export default function ExpedienteDetail() {
           <table>
             <thead>
               <tr>
-                <th>Numeral</th>
-                <th>Entregable identificado</th>
-                <th>Referencia documental</th>
-                <th>Plazo de entrega</th>
+                <th>A · Numeral</th>
+                <th>B · Entregable identificado</th>
+                <th>C · Plazo exigido</th>
+                <th>D · Referencia documental</th>
+                <th>E · Seguimiento Operativo</th>
               </tr>
             </thead>
             <tbody>
               {deliverables.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="muted">
+                  <td colSpan={5} className="muted">
                     Los entregables de gestión aparecerán aquí después del análisis.
                   </td>
                 </tr>
@@ -351,10 +356,21 @@ export default function ExpedienteDetail() {
                   <td className="mono">{row.numeral}</td>
                   <td>{row.name}</td>
                   <td>
+                    <input defaultValue={row.due_term} onBlur={(e) => patchDeliverable(row.id, { due_term: e.target.value })} />
+                  </td>
+                  <td>
                     <input defaultValue={row.reference} onBlur={(e) => patchDeliverable(row.id, { reference: e.target.value })} />
                   </td>
                   <td>
-                    <input defaultValue={row.due_term} onBlur={(e) => patchDeliverable(row.id, { due_term: e.target.value })} />
+                    <select
+                      className={`status-select status-${row.compliance === "NO_CUMPLE" ? "INCUMPLIDO" : row.compliance || "PENDIENTE"}`}
+                      value={row.compliance === "NO_CUMPLE" ? "INCUMPLIDO" : row.compliance || "PENDIENTE"}
+                      onChange={(e) => patchDeliverable(row.id, { compliance: e.target.value })}
+                    >
+                      <option value="PENDIENTE">☐ Pendiente</option>
+                      <option value="CUMPLIDO">☑ Cumplido</option>
+                      <option value="INCUMPLIDO">☒ Incumplido</option>
+                    </select>
                   </td>
                 </tr>
               ))}

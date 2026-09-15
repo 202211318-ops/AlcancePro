@@ -3,6 +3,7 @@ from fastapi.responses import Response
 from beanie.operators import In
 
 from ..access import can_mutate
+from ..compliance import VALID_CODES, normalize_compliance
 from ..deps import get_current_user, require_roles
 from ..models import AnalysisJob, AuditLog, Deliverable, Expediente, ScopeItem, User
 from ..schemas import DeliverableUpdateIn, ScopeItemUpdateIn, serialize_deliverable, serialize_job, serialize_scope
@@ -68,12 +69,14 @@ async def update_checklist(item_id: str, payload: ScopeItemUpdateIn, user: User 
     if not item:
         raise HTTPException(status_code=404, detail="Ítem no encontrado")
     data = payload.model_dump(exclude_unset=True)
-    if "compliance" in data and data["compliance"] not in {"PENDIENTE", "CUMPLIDO", "NO_CUMPLE"}:
-        raise HTTPException(status_code=400, detail="Estado de cumplimiento no válido")
+    if "compliance" in data:
+        if data["compliance"] not in VALID_CODES:
+            raise HTTPException(status_code=400, detail="Estado de seguimiento operativo no válido")
+        data["compliance"] = normalize_compliance(data["compliance"])
     if user.role == "REVISOR":
         data = {"compliance": data["compliance"]} if "compliance" in data else {}
         if not data:
-            raise HTTPException(status_code=403, detail="El revisor solo puede marcar cumplimiento")
+            raise HTTPException(status_code=403, detail="El revisor solo puede marcar seguimiento operativo")
     for key, value in data.items():
         setattr(item, key, value)
     item.has_contradiction = any(
@@ -96,9 +99,15 @@ async def update_deliverable(item_id: str, payload: DeliverableUpdateIn, user: U
     item = await Deliverable.get(item_id)
     if not item:
         raise HTTPException(status_code=404, detail="Entregable no encontrado")
-    if user.role == "REVISOR":
-        raise HTTPException(status_code=403, detail="El revisor no edita entregables")
     data = payload.model_dump(exclude_unset=True)
+    if "compliance" in data:
+        if data["compliance"] not in VALID_CODES:
+            raise HTTPException(status_code=400, detail="Estado de seguimiento operativo no válido")
+        data["compliance"] = normalize_compliance(data["compliance"])
+    if user.role == "REVISOR":
+        data = {"compliance": data["compliance"]} if "compliance" in data else {}
+        if not data:
+            raise HTTPException(status_code=403, detail="El revisor solo puede marcar seguimiento operativo")
     for key, value in data.items():
         setattr(item, key, value)
     await item.save()
@@ -112,7 +121,7 @@ async def export_excel(expediente_id: str, user: User = Depends(get_current_user
     if count == 0:
         raise HTTPException(status_code=400, detail="Ejecute el análisis antes de exportar el Excel")
     content = await build_workbook(expediente)
-    filename = f"Checklist_Alcance_Proyecto_{expediente.code}.xlsx"
+    filename = "Checklist_Alcance_Proyecto.xlsx"
     return Response(
         content=content,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

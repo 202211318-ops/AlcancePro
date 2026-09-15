@@ -3,6 +3,8 @@ from typing import Optional
 
 from pydantic import BaseModel, EmailStr, Field
 
+from .compliance import normalize_compliance
+
 
 class RegisterIn(BaseModel):
     name: str = Field(min_length=2, max_length=120)
@@ -55,6 +57,7 @@ class DeliverableUpdateIn(BaseModel):
     name: Optional[str] = None
     reference: Optional[str] = None
     due_term: Optional[str] = None
+    compliance: Optional[str] = None
 
 
 def serialize_user(user) -> dict:
@@ -125,7 +128,7 @@ def serialize_scope(item) -> dict:
         "consultas": item.consultas,
         "propuesta": item.propuesta,
         "contrato": item.contrato,
-        "compliance": item.compliance,
+        "compliance": normalize_compliance(item.compliance),
         "has_contradiction": item.has_contradiction,
         "sort_order": item.sort_order,
     }
@@ -139,5 +142,6 @@ def serialize_deliverable(item) -> dict:
         "name": item.name,
         "reference": item.reference,
         "due_term": item.due_term,
+        "compliance": normalize_compliance(getattr(item, "compliance", None)),
         "sort_order": item.sort_order,
     }

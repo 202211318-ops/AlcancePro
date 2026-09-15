@@ -102,6 +102,7 @@ class Deliverable(Document):
     name: str
     reference: str = ""
     due_term: str = ""
+    compliance: str = "PENDIENTE"
     sort_order: int = 0
 
     class Settings:

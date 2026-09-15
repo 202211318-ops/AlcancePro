@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 
 import httpx
 
-from ..config import settings
+from ..compliance import normalize_compliance
 from ..models import AnalysisJob, Deliverable, Expediente, ScopeItem, utcnow
 from ..prompt import PROMPT_VERSION, SYSTEM_PROMPT, build_user_prompt
 
@@ -91,7 +91,7 @@ async def persist_analysis(expediente: Expediente, job: AnalysisJob, result: dic
             consultas=str(item.get("consultas") or "").strip(),
             propuesta=str(item.get("propuesta") or "").strip(),
             contrato=str(item.get("contrato") or "").strip(),
-            compliance="PENDIENTE",
+            compliance=normalize_compliance(item.get("seguimiento_operativo") or item.get("compliance")),
             has_contradiction=has_flag,
             sort_order=index,
         )
@@ -105,6 +105,7 @@ async def persist_analysis(expediente: Expediente, job: AnalysisJob, result: dic
             name=str(item.get("entregable") or "").strip(),
             reference=str(item.get("referencia_documental") or "").strip(),
             due_term=str(item.get("plazo_entrega") or "").strip(),
+            compliance=normalize_compliance(item.get("seguimiento_operativo") or item.get("compliance")),
             sort_order=index,
         )
         if row.name:
